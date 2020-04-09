@@ -2,17 +2,23 @@ import tkinter as tk
 from tkinter import ttk
 from sense_emu import SenseHat # pip3 install sense_emu
 import matplotlib as plt
+import time
 
 sense = SenseHat()
 temp = sense.temp
 pre = sense.pressure
 hum = sense.humidity
 
+#tiempo =time.time(10)
+
 class Aplicacion:
     def __init__(self):
         self.sense=SenseHat()
         self.ventana1=tk.Tk()
         self.ventana1.title("Practica Interfaz con SenseHat")
+
+        self.inicio=0
+        self.para=0
 
         self.cuaderno1 = ttk.Notebook(self.ventana1)
         
@@ -21,7 +27,7 @@ class Aplicacion:
 
         self.label1=tk.Label(self.pagina1, text="Control")
         self.label1.grid(column=0, row=2)
-        self.boton1=tk.Button(self.pagina1, text="PARAR")
+        self.boton1=tk.Button(self.pagina1, text="PARAR", command=self.parar)
         self.boton1.grid(column=1, row=2)
         self.label2=tk.Label(self.pagina1, text="Periodo:")
         self.label2.grid(column=1, row=3)
@@ -43,23 +49,12 @@ class Aplicacion:
 
         self.radio1=tk.Radiobutton(self.pagina1,text="Temperatura", variable=self.seleccion, value=1)
         self.radio1.grid(column=0, row=9)
-        self.radio2=tk.Radiobutton(self.pagina1,text="Preción", variable=self.seleccion, value =2)
+        self.radio2=tk.Radiobutton(self.pagina1,text="Presión", variable=self.seleccion, value =2)
         self.radio2.grid(column=1, row=9)
         self.radio3=tk.Radiobutton(self.pagina1,text="Humedad", variable=self.seleccion, value =3)
         self.radio3.grid(column=2, row=9)
 
 
-        self.seleccion1=tk.IntVar()
-        self.seleccion1.set(1)
-        self.check1=ttk.Checkbutton(self.ventana1,text="Temperatura", variable=self.seleccion1)
-        
-        self.seleccion2=tk.IntVar()
-        self.seleccion2.set(2)
-        self.check2=ttk.Checkbutton(self.ventana1,text="Peción", variable=self.seleccion2)
-    
-        self.seleccion3=tk.IntVar()
-        self.seleccion3.set(3)
-        self.check3=ttk.Checkbutton(self.ventana1,text="Humedad", variable=self.seleccion3)
 
 
         self.scroll1 = tk.Scrollbar(self.ventana1, orient=tk.VERTICAL)
@@ -94,25 +89,28 @@ class Aplicacion:
         self.cuaderno1.grid(column=0, row=0)        
         self.ventana1.mainloop()
 
+        self.ventana1(time.sleep(10), self.datos)
         
 
     def datos(self):
-        if self.seleccion1.get()==1:
-           temp = self.sense.temp
-           self.listbox1.insert(0,str(temp))
-        else :
-            self.listbox1.configure(text="-", foreground="red")
+            if self.seleccion.get()==1 or self.inicio==0:
+                temp = self.sense.temp
+                self.listbox1.insert(0,str(temp))
+                self.inicio=1
+            elif  self.seleccion.get()==2 or self.inicio==0:
+                pre = self.sense.pressure
+                self.listbox1.insert(0,str(pre))
+                self.inicio=1
+            
+            elif  self.seleccion.get()==3 or self.inicio==0:
+                hum = self.sense.humidity
+                self.listbox1.insert(0,str(hum))
+                self.inicio=1
 
-        if  self.seleccion2.get()==2:
-            pre = self.sense.pressure
-            self.listbox1.insert(0,str(pre))
-        else :
-            self.listbox1.configure(text="-", foreground="red")
+    def parar (self):
+        if self.inicio==1 or self.para==1:
+            self.inicio=0
+
         
-        if  self.seleccion3.get()==3:
-            hum = self.sense.humidity
-            self.listbox1.insert(0,str(hum))
-        else:   
-            self.listbox1.configure(text="-", foreground="red")
         
 aplicacion1=Aplicacion()
